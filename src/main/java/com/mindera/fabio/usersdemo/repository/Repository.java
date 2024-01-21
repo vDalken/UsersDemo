@@ -31,15 +31,18 @@ public class Repository implements UsersRepository {
     }
 
     public User updateUser(final User user) {
-        users
+        boolean userUpdated = users
                 .stream()
                 .filter(listUser -> Objects.equals(listUser.getId(), user.getId()))
                 .findFirst()
-                .ifPresent(listUser -> {
+                .map(listUser -> {
                     listUser.setName(user.getName());
                     listUser.setPassword(user.getPassword());
-                });
-        return user;
+                    return true;
+                })
+                .orElse(false);
+
+        return userUpdated ? user : null;
     }
 
     public User deleteUser(final Long id) {

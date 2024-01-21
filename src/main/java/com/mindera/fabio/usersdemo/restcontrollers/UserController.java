@@ -41,7 +41,11 @@ public class UserController {
         if(!Objects.equals(id, user.getId())){
             throw new UserDoesNotMatchException();
         }
-        return service.updateUser(user);
+        User newUser = service.updateUser(user);
+        if(newUser.equals(null)){
+            throw new UserNotFoundException();
+        }
+        return newUser;
     }
 
     @DeleteMapping("/{id}")
