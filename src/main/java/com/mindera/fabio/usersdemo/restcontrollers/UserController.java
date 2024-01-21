@@ -1,11 +1,13 @@
 package com.mindera.fabio.usersdemo.restcontrollers;
 
+import com.mindera.fabio.usersdemo.exceptions.UserDoesNotMatchException;
 import com.mindera.fabio.usersdemo.model.User;
 import com.mindera.fabio.usersdemo.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/user")
@@ -29,8 +31,11 @@ public class UserController {
         return service.getAllUsers();
     }
 
-    @PutMapping
-    public User updateUser(@RequestBody User user){
+    @PutMapping("/{id}")
+    public User updateUser(@PathVariable Long id, @RequestBody User user){
+        if(!Objects.equals(id, user.getId())){
+            throw new UserDoesNotMatchException();
+        }
         return service.updateUser(user);
     }
 
