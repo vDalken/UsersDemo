@@ -1,6 +1,7 @@
 package com.mindera.fabio.usersdemo.restcontrollers;
 
 import com.mindera.fabio.usersdemo.exceptions.UserDoesNotMatchException;
+import com.mindera.fabio.usersdemo.exceptions.UserNotFoundException;
 import com.mindera.fabio.usersdemo.model.User;
 import com.mindera.fabio.usersdemo.services.UserService;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +19,11 @@ public class UserController {
 
     @GetMapping("/{userID}")
     public User getUserById(@PathVariable Long userID){
-        return service.getUserById(userID);
+        User user = service.getUserById(userID);
+        if(user.equals(null)){
+            throw new UserNotFoundException();
+        }
+        return user;
     }
 
     @PostMapping
