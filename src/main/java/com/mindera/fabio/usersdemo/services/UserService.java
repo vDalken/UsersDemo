@@ -1,36 +1,43 @@
 package com.mindera.fabio.usersdemo.services;
 
+import com.mindera.fabio.usersdemo.interfaces.UsersRepository;
 import com.mindera.fabio.usersdemo.model.User;
-import com.mindera.fabio.usersdemo.repository.Repository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 public class UserService {
 
-    private final Repository repository;
+    private final UsersRepository usersRepository;
 
-    public User createUser(final User user){
-        return repository.createUser(user);
+    public UserService(UsersRepository usersRepository) {
+        this.usersRepository = usersRepository;
     }
 
-    public User getUserById(Long id){
-        return repository.getUserById(id);
+    public User createUser(final User user) {
+        return usersRepository.save(user);
     }
 
-    public List<User> getAllUsers(){
-        return repository.getUsers();
+    public User getUserById(Long id) {
+        return usersRepository.findById(id).orElse(null);
     }
 
-    public User updateUser(User user){
-        return repository.updateUser(user);
+    public List<User> getAllUsers() {
+        return usersRepository.findAll();
     }
 
-    public User deleteUser(Long id){
-        return repository.deleteUser(id);
+    public User updateUser(User user) {
+        if (usersRepository.existsById(user.getId())) {
+            return usersRepository.save(user);
+        }
+        return null;
     }
 
+    public User deleteUser(Long id) {
+        Optional<User> userToBeDeleted = usersRepository.findById(id);
+        userToBeDeleted.ifPresent(usersRepository::delete);
+        return userToBeDeleted.orElse(null);
+    }
 }

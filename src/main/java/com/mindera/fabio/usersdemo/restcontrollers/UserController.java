@@ -5,6 +5,7 @@ import com.mindera.fabio.usersdemo.exceptions.UserNotFoundException;
 import com.mindera.fabio.usersdemo.model.User;
 import com.mindera.fabio.usersdemo.services.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,10 +13,14 @@ import java.util.Objects;
 
 @RestController
 @RequestMapping("/user")
-@RequiredArgsConstructor
+
 public class UserController {
 
     private final UserService service;
+
+    public UserController(UserService service) {
+        this.service = service;
+    }
 
     @GetMapping("/{userID}")
     public User getUserById(@PathVariable Long userID){

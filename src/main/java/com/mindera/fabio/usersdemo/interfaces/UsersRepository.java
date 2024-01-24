@@ -1,13 +1,9 @@
 package com.mindera.fabio.usersdemo.interfaces;
 
 import com.mindera.fabio.usersdemo.model.User;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface UsersRepository {
-    public User createUser(final User user);
-
-    public User getUserById(final Long id);
-
-    public User updateUser(final User user);
-
-    public User deleteUser(final Long id);
+@Repository
+public interface UsersRepository extends JpaRepository<User, Long> {
 }
