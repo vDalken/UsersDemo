@@ -11,18 +11,14 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Objects;
 
+@RequiredArgsConstructor
 @RestController
-@RequestMapping("/user")
-
+@RequestMapping("/user") //tells to where to map the http requests
 public class UserController {
 
     private final UserService service;
 
-    public UserController(UserService service) {
-        this.service = service;
-    }
-
-    @GetMapping("/{userID}")
+    @GetMapping("/{userID}") //it's a get request with variable placeholder
     public User getUserById(@PathVariable Long userID){
         User user = service.getUserById(userID);
         if(user.equals(null)){
@@ -31,17 +27,17 @@ public class UserController {
         return user;
     }
 
-    @PostMapping
+    @PostMapping //indicates that this method handles post requests
     public User createUser(@RequestBody User user){
         return service.createUser(user);
     }
 
-    @GetMapping
+    @GetMapping //indicates that this method handles get requests
     public List<User> getAllUsers(){
         return service.getAllUsers();
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/{id}") //indicates that this method handles put requests, with a placeholder variable
     public User updateUser(@PathVariable Long id, @RequestBody User user){
         if(!Objects.equals(id, user.getId())){
             throw new UserDoesNotMatchException();
@@ -53,7 +49,7 @@ public class UserController {
         return newUser;
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{id}") //indicates that this method handles delete requests
     public User deleteUser(@PathVariable Long id){
         return service.deleteUser(id);
     }
