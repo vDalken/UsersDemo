@@ -1,11 +1,11 @@
 package com.mindera.fabio.usersdemo.model;
 
 import jakarta.persistence.*;
-import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
 @Data
-@Builder
 @Entity
 @Table(name = "users")
 public class User {
