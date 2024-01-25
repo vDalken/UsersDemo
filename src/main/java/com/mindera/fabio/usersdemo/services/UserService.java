@@ -1,5 +1,6 @@
 package com.mindera.fabio.usersdemo.services;
 
+import com.mindera.fabio.usersdemo.exceptions.UserNotFoundException;
 import com.mindera.fabio.usersdemo.interfaces.UsersRepository;
 import com.mindera.fabio.usersdemo.model.User;
 import lombok.AllArgsConstructor;
@@ -19,7 +20,7 @@ public class UserService {
     }
 
     public User getUserById(Long id) {
-        return usersRepository.findById(id).orElse(null);
+        return usersRepository.findById(id).orElseThrow(() -> new UserNotFoundException());
     }
 
     public List<User> getAllUsers() {
@@ -30,12 +31,12 @@ public class UserService {
         if (usersRepository.existsById(user.getId())) {
             return usersRepository.save(user);
         }
-        return null;
+        throw new UserNotFoundException();
     }
 
     public User deleteUser(Long id) {
         Optional<User> userToBeDeleted = usersRepository.findById(id);
         userToBeDeleted.ifPresent(usersRepository::delete);
-        return userToBeDeleted.orElse(null);
+        return userToBeDeleted.orElseThrow(() -> new UserNotFoundException());
     }
 }
