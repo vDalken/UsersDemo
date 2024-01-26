@@ -19,11 +19,7 @@ public class UserController {
 
     @GetMapping("/{userID}") //it's a get request with variable placeholder
     public User getUserById(@PathVariable Long userID){
-        User user = service.getUserById(userID);
-        if(user.equals(null)){
-            throw new UserNotFoundException();
-        }
-        return user;
+        return service.getUserById(userID);
     }
 
     @PostMapping //indicates that this method handles post requests
