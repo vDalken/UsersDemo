@@ -20,7 +20,7 @@ public class UserService {
     }
 
     public User getUserById(Long userId) {
-        return usersRepository.findById(userId).orElseThrow(() -> new UserNotFoundException());
+        return usersRepository.findById(userId).orElseThrow(UserNotFoundException::new);
     }
 
     public List<User> getAllUsers() {
@@ -37,6 +37,6 @@ public class UserService {
     public User deleteUser(Long userId) {
         Optional<User> userToBeDeleted = usersRepository.findById(userId);
         userToBeDeleted.ifPresent(usersRepository::delete);
-        return userToBeDeleted.orElseThrow(() -> new UserNotFoundException());
+        return userToBeDeleted.orElseThrow(UserNotFoundException::new);
     }
 }
