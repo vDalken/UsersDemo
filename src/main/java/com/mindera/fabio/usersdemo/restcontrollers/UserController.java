@@ -36,9 +36,9 @@ public class UserController {
         return service.getAllUsers();
     }
 
-    @PutMapping("/{id}") //indicates that this method handles put requests, with a placeholder variable
-    public User updateUser(@PathVariable Long id, @RequestBody User user){
-        if(!Objects.equals(id, user.getId())){
+    @PutMapping("/{userId}") //indicates that this method handles put requests, with a placeholder variable
+    public User updateUser(@PathVariable Long userId, @RequestBody User user){
+        if(!Objects.equals(userId, user.getId())){
             throw new UserDoesNotMatchException();
         }
         return service.updateUser(user);
