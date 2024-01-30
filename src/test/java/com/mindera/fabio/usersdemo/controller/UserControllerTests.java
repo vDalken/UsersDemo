@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mindera.fabio.usersdemo.model.User;
 import com.mindera.fabio.usersdemo.restcontrollers.UserController;
 import com.mindera.fabio.usersdemo.services.UserService;
+import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -55,7 +56,10 @@ public class UserControllerTests {
 
         //defining what status code to expect from the response of the HTTP method
         //in this case we're expecting 200
-        response.andExpect(MockMvcResultMatchers.status().is(200));
+        response.andExpect(MockMvcResultMatchers.status().is(200))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id", CoreMatchers.is(sampleUser.getId().intValue())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name", CoreMatchers.is(sampleUser.getName())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.password", CoreMatchers.is(sampleUser.getPassword())));
     }
 
 
