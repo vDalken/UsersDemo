@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -56,7 +55,8 @@ public class UserControllerTests {
     @Test
     public void UserController_createUser_ReturnCreated() throws Exception {
         //given method allows me to define the method to be called and the arguments to be passed
-        given(userService.createUser(ArgumentMatchers.any(User.class))).willAnswer(invocation -> invocation.getArgument(0));
+        given(userService.createUser(ArgumentMatchers.any(User.class))).willReturn(sampleUser1);
+
         //willAnswer defines what should be returned by the method call and says it should be it's own argument
 
         //response will store the info about the execution of the mock HTTP method
@@ -104,7 +104,7 @@ public class UserControllerTests {
 
     @Test
     public void UserController_updateUser_ReturnUpdatedUser() throws Exception{
-        given(userService.updateUser(ArgumentMatchers.any(User.class))).willAnswer(invocation -> invocation.getArgument(0));
+        given(userService.updateUser(ArgumentMatchers.any(User.class))).willReturn(sampleUser2);
 
         ResultActions response = mockMvc.perform(put("/user/{id}",2L)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -118,7 +118,7 @@ public class UserControllerTests {
 
     @Test
     public void UserController_deleteUser_ReturnDeletedUser() throws Exception{
-        given(userService.deleteUser(anyLong())).willAnswer(invocation -> sampleUser1);
+        given(userService.deleteUser(anyLong())).willReturn(sampleUser1);
 
         ResultActions response = mockMvc.perform(delete("/user/{id}",1L)
                 .contentType(MediaType.APPLICATION_JSON)
