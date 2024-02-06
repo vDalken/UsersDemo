@@ -1,0 +1,21 @@
+version: "3.9"
+
+networks:
+  database_net:
+    name: database_net
+    driver: bridge
+
+services:
+  database:
+    image: postgres
+    container_name: my-db-container
+    volumes:
+      - ~/.docker-conf/postgres/data/:/var/lib/postgres
+    ports:
+      - 5433:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 090712
+      POSTGRES_DB: usersdemo_db
+    networks:
+        - database_net
