@@ -21,7 +21,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-public class UserServiceUnitTests {
+public class UserServiceTests {
     @Mock //annonation used to mock an object, @MockBean is for integration tests
     private UsersRepository usersRepository;
 
