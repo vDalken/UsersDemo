@@ -1,6 +1,8 @@
 package com.mindera.fabio.usersdemo.restcontrollers;
 
+import com.mindera.fabio.usersdemo.exceptions.UserCannotBeNullException;
 import com.mindera.fabio.usersdemo.exceptions.UserDoesNotMatchException;
+import com.mindera.fabio.usersdemo.exceptions.UserFieldsCannotBeNullOrEmptyException;
 import com.mindera.fabio.usersdemo.exceptions.UserNotFoundException;
 import com.mindera.fabio.usersdemo.model.User;
 import com.mindera.fabio.usersdemo.services.UserService;
@@ -36,6 +38,12 @@ public class UserController {
     public User updateUser(@PathVariable Long userId, @RequestBody User user){
         if(!Objects.equals(userId, user.getId())){
             throw new UserDoesNotMatchException();
+        }
+        if(user == null){
+            throw new UserCannotBeNullException();
+        }
+        if (user.getId() == null || user.getName() == null || user.getName().isEmpty() || user.getPassword() == null || user.getPassword().isEmpty()) {
+            throw new UserFieldsCannotBeNullOrEmptyException();
         }
         return service.updateUser(user);
     }
