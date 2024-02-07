@@ -18,4 +18,15 @@ public class User {
     private Long id;
     private String name;
     private String password;
+
+    @Override
+    public boolean equals(Object user) {
+        if(getClass() != user.getClass()){
+            return false;
+        }
+        User convertedUser = (User) user;
+        return Objects.equals(id, convertedUser.id) &&
+                Objects.equals(name, convertedUser.name) &&
+                Objects.equals(password, convertedUser.password);
+    }
 }
