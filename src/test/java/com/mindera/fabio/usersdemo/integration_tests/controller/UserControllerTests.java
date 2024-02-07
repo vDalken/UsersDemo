@@ -9,6 +9,7 @@ import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -22,8 +23,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 @Transactional
 @SpringBootTest
+@AutoConfigureMockMvc
 public class UserControllerTests {
-
+    @Autowired
     private MockMvc mockMvc; //to mock http requests
 
     @Autowired
@@ -44,7 +46,6 @@ public class UserControllerTests {
         sampleUser2 = User.builder().id(9L).name("mima").password("youwww").build();
         sampleUser3 = User.builder().id(3L).name("weiza").password("UAUUU").build();
         sampleUsers = List.of(sampleUser1,sampleUser2,sampleUser3);
-        mockMvc =  MockMvcBuilders.standaloneSetup(new UserController(userService)).build();
     }
 
     @Test
