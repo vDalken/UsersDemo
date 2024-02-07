@@ -52,8 +52,6 @@ public class UserControllerTests {
         //given method allows me to define the method to be called and the arguments to be passed
         userService.createUser(sampleUser1);
 
-        //willAnswer defines what should be returned by the method call and says it should be it's own argument
-
         //response will store the info about the execution of the mock HTTP method
         ResultActions response = mockMvc.perform(post("/user") //post method meaning it's a post request with the path to the method
                 .contentType(MediaType.APPLICATION_JSON) //says the content type of the request is a JSON
