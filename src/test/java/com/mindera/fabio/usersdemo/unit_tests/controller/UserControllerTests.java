@@ -5,26 +5,19 @@ import com.mindera.fabio.usersdemo.restcontrollers.UserController;
 import com.mindera.fabio.usersdemo.services.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.mockito.MockitoAnnotations;
 
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.verify;
 
-@ExtendWith(MockitoExtension.class)
 class UserControllerTests {
-
-    private MockMvc mockMvc;
 
     @Mock
     private UserService userService;
@@ -39,7 +32,7 @@ class UserControllerTests {
 
     @BeforeEach
     public void init() {
-        mockMvc = MockMvcBuilders.standaloneSetup(userController).build();
+        MockitoAnnotations.initMocks(this);
 
         sampleUser1 = User.builder().id(1L).name("marlao").password("1pow").build();
         sampleUser2 = User.builder().id(2L).name("mima").password("youwww").build();
@@ -48,61 +41,52 @@ class UserControllerTests {
     }
 
     @Test
-    void getUserById_ReturnUser() throws Exception {
+    void getUserById_ReturnUser() {
         given(userService.getUserById(ArgumentMatchers.anyLong())).willReturn(sampleUser1);
 
-        mockMvc.perform(get("/user/{userID}", 1L)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(sampleUser1.getId().intValue()))
-                .andExpect(jsonPath("$.name").value(sampleUser1.getName()))
-                .andExpect(jsonPath("$.password").value(sampleUser1.getPassword()));
+        User returnedUser = userController.getUserById(1L);
+
+        assertEquals(sampleUser1, returnedUser);
+        verify(userService).getUserById(1L);
     }
 
     @Test
-    void createUser_ReturnCreated() throws Exception {
+    void createUser_ReturnCreated() {
         given(userService.createUser(any(User.class))).willReturn(sampleUser1);
 
-        mockMvc.perform(post("/user")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"id\":1,\"name\":\"marlao\",\"password\":\"1pow\"}"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(sampleUser1.getId().intValue()))
-                .andExpect(jsonPath("$.name").value(sampleUser1.getName()))
-                .andExpect(jsonPath("$.password").value(sampleUser1.getPassword()));
+        User createdUser = userController.createUser(sampleUser1);
+
+        assertEquals(sampleUser1, createdUser);
+        verify(userService).createUser(sampleUser1);
     }
 
     @Test
-    void getAllUsers_ReturnExpectedUsers() throws Exception {
+    void getAllUsers_ReturnExpectedUsers() {
         given(userService.getAllUsers()).willReturn(sampleUsers);
 
-        mockMvc.perform(get("/user")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+        List<User> returnedUsers = userController.getAllUsers();
+
+        assertEquals(sampleUsers, returnedUsers);
+        verify(userService).getAllUsers();
     }
 
     @Test
-    void updateUser_ReturnUpdatedUser() throws Exception {
+    void updateUser_ReturnUpdatedUser() {
         given(userService.updateUser(any(User.class))).willReturn(sampleUser2);
 
-        mockMvc.perform(put("/user/{userId}", 2L)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"id\":2,\"name\":\"mima\",\"password\":\"youwww\"}"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(sampleUser2.getId().intValue()))
-                .andExpect(jsonPath("$.name").value(sampleUser2.getName()))
-                .andExpect(jsonPath("$.password").value(sampleUser2.getPassword()));
+        User updatedUser = userController.updateUser(sampleUser2.getId(),sampleUser2);
+
+        assertEquals(sampleUser2, updatedUser);
+        verify(userService).updateUser(sampleUser2);
     }
 
     @Test
-    void deleteUser_ReturnDeletedUser() throws Exception {
+    void deleteUser_ReturnDeletedUser() {
         given(userService.deleteUser(ArgumentMatchers.anyLong())).willReturn(sampleUser1);
 
-        mockMvc.perform(delete("/user/{id}", 1L)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(sampleUser1.getId().intValue()))
-                .andExpect(jsonPath("$.name").value(sampleUser1.getName()))
-                .andExpect(jsonPath("$.password").value(sampleUser1.getPassword()));
+        User deletedUser = userController.deleteUser(1L);
+
+        assertEquals(sampleUser1, deletedUser);
+        verify(userService).deleteUser(1L);
     }
 }
