@@ -40,13 +40,10 @@ public class UserControllerIntegrationTests {
     private User sampleUser2;
     private User sampleUser3;
     List<User> sampleUsers;
-    private User createdUser;
     private User userToCreate;
     private User existingUser;
-    private User updatedUser;
     private User nonExistingUser;
     private Long nonExistingUserId;
-    private Long maxUserId;
 
     @BeforeEach
     public void init() {
@@ -56,7 +53,6 @@ public class UserControllerIntegrationTests {
         sampleUsers = List.of(sampleUser1,sampleUser2,sampleUser3);
 
         userToCreate = User.builder().name("fabio").password("123").build();
-        createdUser = User.builder().id(1L).name("fabio").password("123").build();
 
         sampleUsers = List.of(
                 User.builder().id(5L).name("rita").password("LOOGOOO").build(),
@@ -65,11 +61,9 @@ public class UserControllerIntegrationTests {
         );
 
         existingUser = User.builder().id(1L).name("oldName").password("oldPass").build();
-        updatedUser = User.builder().id(1L).name("newName").password("newPass").build();
         nonExistingUser = User.builder().id(910L).name("naoexiste").password("piwu").build();
 
         nonExistingUserId = usersRepository.findMaxUserId()+1;
-        maxUserId = usersRepository.findMaxUserId();
     }
 
     @Test
