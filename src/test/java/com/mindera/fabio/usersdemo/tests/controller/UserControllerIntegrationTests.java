@@ -1,11 +1,13 @@
-package com.mindera.fabio.usersdemo.integration_tests.controller;
+package com.mindera.fabio.usersdemo.tests.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mindera.fabio.usersdemo.exceptions.UserNotFoundException;
+import com.mindera.fabio.usersdemo.interfaces.UsersRepository;
 import com.mindera.fabio.usersdemo.model.User;
-import com.mindera.fabio.usersdemo.restcontrollers.UserController;
 import com.mindera.fabio.usersdemo.services.UserService;
 import jakarta.transaction.Transactional;
 import org.hamcrest.CoreMatchers;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,51 +17,69 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.List;
 
+import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 @Transactional
 @SpringBootTest
 @AutoConfigureMockMvc
-public class UserControllerTests {
+public class UserControllerIntegrationTests {
     @Autowired
-    private MockMvc mockMvc; //to mock http requests
-
+    private MockMvc mockMvc;
     @Autowired
-    private UserService userService; //to mock this method call
-
+    private UserService userService;
     @Autowired
-    private ObjectMapper objectMapper; //to map my object to JSON format
-
+    private UsersRepository usersRepository;
+    @Autowired
+    private ObjectMapper objectMapper;
     private User sampleUser1;
     private User sampleUser2;
     private User sampleUser3;
     List<User> sampleUsers;
+    private User createdUser;
+    private User userToCreate;
+    private User existingUser;
+    private User updatedUser;
+    private User nonExistingUser;
+    private Long nonExistingUserId;
+    private Long maxUserId;
 
-    //before each annotation refreshes the state of every resource before initializing another test
     @BeforeEach
     public void init() {
         sampleUser1 = User.builder().id(1L).name("marlao").password("1pow").build();
         sampleUser2 = User.builder().id(9L).name("mima").password("youwww").build();
         sampleUser3 = User.builder().id(3L).name("weiza").password("UAUUU").build();
         sampleUsers = List.of(sampleUser1,sampleUser2,sampleUser3);
+
+        userToCreate = User.builder().name("fabio").password("123").build();
+        createdUser = User.builder().id(1L).name("fabio").password("123").build();
+
+        sampleUsers = List.of(
+                User.builder().id(5L).name("rita").password("LOOGOOO").build(),
+                User.builder().id(6L).name("joao").password("rfierrs").build(),
+                User.builder().id(7L).name("mara").password("fsdsa").build()
+        );
+
+        existingUser = User.builder().id(1L).name("oldName").password("oldPass").build();
+        updatedUser = User.builder().id(1L).name("newName").password("newPass").build();
+        nonExistingUser = User.builder().id(910L).name("naoexiste").password("piwu").build();
+
+        nonExistingUserId = usersRepository.findMaxUserId()+1;
+        maxUserId = usersRepository.findMaxUserId();
     }
 
     @Test
     void createUser_ReturnCreated() throws Exception {
-        //given method allows me to define the method to be called and the arguments to be passed
         userService.createUser(sampleUser1);
 
-        //response will store the info about the execution of the mock HTTP method
         ResultActions response = mockMvc.perform(post("/user") //post method meaning it's a post request with the path to the method
-                .contentType(MediaType.APPLICATION_JSON) //says the content type of the request is a JSON
+                .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(sampleUser1))); //user sample
 
-        //defining what status code to expect from the response of the HTTP method
-        //in this case we're expecting 200
         response.andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id", CoreMatchers.is(sampleUser1.getId().intValue())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name", CoreMatchers.is(sampleUser1.getName())))
@@ -67,23 +87,37 @@ public class UserControllerTests {
     }
 
     @Test
+    void createUser_ReturnsCreatedUser() {
+        userService.createUser(userToCreate);
+
+        User createdUser = usersRepository.findById(userToCreate.getId()).orElseThrow(() -> new RuntimeException("user not found"));
+
+        assertNotNull(createdUser);
+        assertEquals(userToCreate,createdUser);
+    }
+
+    @Test
     void getAllUsers_ReturnExpectedUsers() throws Exception{
-        //created a sample list of users to mock the return content of the method call
-        //since it doesn't take any arguments so I don't know what to expect besides a list of objects of type User
         userService.getAllUsers();
 
-        //mocked the get http request, and sets the content type of the method as JSON and says that
-        //the content should be a JSON string of all the objects it got from the mocked service method call
         ResultActions response = mockMvc.perform(get("/user")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(sampleUsers)));
 
-        //checking if the status of the response is 200, which means ok
         response.andExpect(MockMvcResultMatchers.status().isOk());
     }
 
     @Test
-    void getUser_ReturnUser() throws Exception {
+    void getAllUsers_ReturnAllUsers() {
+        List<User> users = usersRepository.findAll();
+
+        List<User> result = userService.getAllUsers();
+
+        assertEquals(users, result);
+    }
+
+    @Test
+    void getUserById_ReturnUser() throws Exception {
         userService.createUser(sampleUser1);
         Long returnedUserId = sampleUser1.getId();
         User returnedUser = userService.getUserById(returnedUserId);
@@ -95,6 +129,22 @@ public class UserControllerTests {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id",CoreMatchers.is(returnedUser.getId().intValue())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name",CoreMatchers.is(returnedUser.getName())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.password",CoreMatchers.is(returnedUser.getPassword())));
+    }
+
+    @Test
+    void getUserById_ExistingUserId_ReturnsUser() {
+        usersRepository.save(sampleUser1);
+
+        User result = userService.getUserById(sampleUser1.getId());
+
+        assertEquals(sampleUser1, result);
+    }
+
+    @Test
+    void getUserById_NonExistingUserId_ThrowUserNotFoundException() {
+        usersRepository.findById(nonExistingUserId);
+
+        assertThrows(UserNotFoundException.class, () -> userService.getUserById(nonExistingUserId));
     }
 
     @Test
@@ -118,6 +168,26 @@ public class UserControllerTests {
     }
 
     @Test
+    void updateUser_ExistingUserId_ReturnUpdatedUser() {
+        Long maxUserId = usersRepository.findMaxUserId();
+        User newUser = usersRepository.findById(maxUserId).orElseThrow(UserNotFoundException::new);
+
+        newUser.setName("mixaaaaaa");
+        newUser.setPassword("miauuuuuu");
+
+        User result = userService.updateUser(newUser);
+
+        Assertions.assertTrue(usersRepository.existsById(maxUserId));
+        assertEquals(newUser, result);
+    }
+
+    @Test
+    void updateUser_NonExistingUserId_ThrowUserNotFoundException() {
+        Assertions.assertFalse(usersRepository.existsById(usersRepository.findMaxUserId()+1));
+        assertThrows(UserNotFoundException.class, () -> userService.updateUser(nonExistingUser));
+    }
+
+    @Test
     void deleteUser_ReturnDeletedUser() throws Exception{
         userService.createUser(sampleUser1);
         Long sampleUser1Id = sampleUser1.getId();
@@ -127,5 +197,23 @@ public class UserControllerTests {
                 .contentType(MediaType.APPLICATION_JSON));
 
         response.andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+    @Test
+    void deleteUser_ExistingUserId_ReturnDeletedUser() {
+        usersRepository.save(existingUser);
+        Long existingUserId = existingUser.getId();
+
+        User result = userService.deleteUser(existingUserId);
+
+        assertNotNull(usersRepository.findById(existingUserId));
+        assertEquals(existingUser, result);
+    }
+
+    @Test
+    void deleteUser_NonExistingUserId_ThrowUserNotFoundException() {
+        usersRepository.findById(nonExistingUserId);
+
+        assertThrows(UserNotFoundException.class, () -> userService.deleteUser(nonExistingUserId));
     }
 }

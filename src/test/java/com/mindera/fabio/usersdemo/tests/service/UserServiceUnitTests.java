@@ -1,37 +1,41 @@
-package com.mindera.fabio.usersdemo.integration_tests.service;
+package com.mindera.fabio.usersdemo.tests.service;
 
 import com.mindera.fabio.usersdemo.exceptions.UserNotFoundException;
 import com.mindera.fabio.usersdemo.interfaces.UsersRepository;
 import com.mindera.fabio.usersdemo.model.User;
 import com.mindera.fabio.usersdemo.services.UserService;
-import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
 
-@SpringBootTest
-@Transactional
+@ExtendWith(MockitoExtension.class)
 public class UserServiceTests {
-    @Autowired
+    @Mock //annonation used to mock an object, @MockBean is for integration tests
     private UsersRepository usersRepository;
-    @Autowired
-    private UserService userService;
+
+    @InjectMocks //injecting the mock repository in the UserService
+    private UserService userService; //the same as: UserService userService = new UserService(usersRepository);
+
     private User createdUser;
+
     private User userToCreate;
     private User sampleUser;
     private List<User> sampleUsers;
     private User existingUser;
     private User updatedUser;
     private User nonExistingUser;
-    private Long nonExistingUserId;
 
     @BeforeEach
     void init() {
@@ -48,84 +52,80 @@ public class UserServiceTests {
         existingUser = User.builder().id(1L).name("oldName").password("oldPass").build();
         updatedUser = User.builder().id(1L).name("newName").password("newPass").build();
         nonExistingUser = User.builder().id(910L).name("naoexiste").password("piwu").build();
-
-        nonExistingUserId = usersRepository.findMaxUserId()+1;
     }
 
     @Test
     void createUser_ReturnsCreatedUser() {
-        userService.createUser(userToCreate);
+        given(userService.createUser(userToCreate)).willReturn(createdUser);
 
-        User createdUser = usersRepository.findById(userToCreate.getId()).orElseThrow(() -> new RuntimeException("user not found"));
+        User result = userService.createUser(userToCreate);
 
-        assertNotNull(createdUser);
-        assertEquals(userToCreate.getName(),createdUser.getName());
-        assertEquals(userToCreate.getPassword(),createdUser.getPassword());
+        verify(usersRepository).save(userToCreate);
     }
 
     @Test
     void getUserById_ExistingUserId_ReturnsUser() {
-        usersRepository.save(sampleUser);
+        Long sampleUserId = sampleUser.getId();
+        given(usersRepository.findById(sampleUserId)).willReturn(Optional.of(sampleUser));
 
-        User result = userService.getUserById(sampleUser.getId());
+        User result = userService.getUserById(sampleUserId);
 
-        assertEquals(sampleUser.getId(), result.getId());
-        assertEquals(sampleUser.getName(),result.getName());
-        assertEquals(sampleUser.getPassword(),result.getPassword());
+        assertEquals(sampleUser, result);
     }
 
     @Test
     void getUserById_NonExistingUserId_ThrowUserNotFoundException() {
-        usersRepository.findById(nonExistingUserId);
+        long nonExistingUserId = 999L;
+
+        given(usersRepository.findById(ArgumentMatchers.anyLong())).willReturn(Optional.empty());
 
         assertThrows(UserNotFoundException.class, () -> userService.getUserById(nonExistingUserId));
     }
 
     @Test
     void getAllUsers_ReturnAllUsers() {
-        List<User> users = usersRepository.findAll();
+
+        given(usersRepository.findAll()).willReturn(sampleUsers);
 
         List<User> result = userService.getAllUsers();
 
-        assertEquals(users, result);
+        assertEquals(sampleUsers, result);
     }
 
     @Test
     void updateUser_ExistingUserId_ReturnUpdatedUser() {
-        Long maxUserId = usersRepository.findMaxUserId();
-        User newUser = usersRepository.findById(maxUserId).orElseThrow(UserNotFoundException::new);
+        given(usersRepository.existsById(existingUser.getId())).willReturn(true);
 
-        newUser.setName("mixaaaaaa");
-        newUser.setPassword("miauuuuuu");
+        given(usersRepository.save(updatedUser)).willReturn(updatedUser);
 
-        User result = userService.updateUser(newUser);
+        User result = userService.updateUser(updatedUser);
 
-        Assertions.assertTrue(usersRepository.existsById(maxUserId));
-        assertEquals(newUser, result);
+        assertEquals(updatedUser, result);
     }
 
     @Test
     void updateUser_NonExistingUserId_ThrowUserNotFoundException() {
-        Assertions.assertFalse(usersRepository.existsById(usersRepository.findMaxUserId()+1));
+        given(usersRepository.existsById(nonExistingUser.getId())).willReturn(false);
+
         assertThrows(UserNotFoundException.class, () -> userService.updateUser(nonExistingUser));
     }
 
     @Test
     void deleteUser_ExistingUserId_ReturnDeletedUser() {
-        usersRepository.save(existingUser);
         Long existingUserId = existingUser.getId();
+        given(usersRepository.findById(existingUserId)).willReturn(Optional.of(existingUser));
 
         User result = userService.deleteUser(existingUserId);
 
-        assertNotNull(usersRepository.findById(existingUserId));
-        assertEquals(existingUser.getId(), result.getId());
-        assertEquals(existingUser.getName(), result.getName());
-        assertEquals(existingUser.getPassword(), result.getPassword());
+        verify(usersRepository).delete(existingUser);
+
+        assertEquals(existingUser, result);
     }
 
     @Test
     void deleteUser_NonExistingUserId_ThrowUserNotFoundException() {
-        usersRepository.findById(nonExistingUserId);
+        long nonExistingUserId = nonExistingUser.getId();
+        given(usersRepository.findById(nonExistingUserId)).willReturn(Optional.empty());
 
         assertThrows(UserNotFoundException.class, () -> userService.deleteUser(nonExistingUserId));
     }
