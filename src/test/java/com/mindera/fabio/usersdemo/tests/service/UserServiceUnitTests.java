@@ -21,15 +21,12 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-public class UserServiceTests {
+public class UserServiceUnitTests {
     @Mock //annonation used to mock an object, @MockBean is for integration tests
     private UsersRepository usersRepository;
-
     @InjectMocks //injecting the mock repository in the UserService
     private UserService userService; //the same as: UserService userService = new UserService(usersRepository);
-
     private User createdUser;
-
     private User userToCreate;
     private User sampleUser;
     private List<User> sampleUsers;
@@ -58,7 +55,7 @@ public class UserServiceTests {
     void createUser_ReturnsCreatedUser() {
         given(userService.createUser(userToCreate)).willReturn(createdUser);
 
-        User result = userService.createUser(userToCreate);
+        userService.createUser(userToCreate);
 
         verify(usersRepository).save(userToCreate);
     }
