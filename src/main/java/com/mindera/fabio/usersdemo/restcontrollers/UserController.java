@@ -3,7 +3,6 @@ package com.mindera.fabio.usersdemo.restcontrollers;
 import com.mindera.fabio.usersdemo.exceptions.UserCannotBeNullException;
 import com.mindera.fabio.usersdemo.exceptions.UserDoesNotMatchException;
 import com.mindera.fabio.usersdemo.exceptions.UserFieldsCannotBeNullOrEmptyException;
-import com.mindera.fabio.usersdemo.exceptions.UserNotFoundException;
 import com.mindera.fabio.usersdemo.model.User;
 import com.mindera.fabio.usersdemo.services.UserService;
 import lombok.RequiredArgsConstructor;
