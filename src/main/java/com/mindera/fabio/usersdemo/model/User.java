@@ -17,6 +17,10 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
+    private String email;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "address_id", referencedColumnName = "id")
+    private Address address;
     private String password;
 
     @Override
@@ -27,6 +31,8 @@ public class User {
         User convertedUser = (User) user;
         return Objects.equals(id, convertedUser.id) &&
                 Objects.equals(name, convertedUser.name) &&
+                Objects.equals(email, convertedUser.email) &&
+                Objects.equals(address, convertedUser.address) &&
                 Objects.equals(password, convertedUser.password);
     }
 }
