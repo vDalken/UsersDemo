@@ -1,2 +1,9 @@
-package com.mindera.fabio.usersdemo.interfaces;public interface AddressesRepository {
+package com.mindera.fabio.usersdemo.interfaces;
+
+import com.mindera.fabio.usersdemo.model.Address;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface AddressesRepository extends JpaRepository<Address, Long> {
 }
