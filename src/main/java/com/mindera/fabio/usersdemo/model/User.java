@@ -25,7 +25,7 @@ public class User {
 
     @Override
     public boolean equals(Object user) {
-        if(getClass() != user.getClass()){
+        if(user== null || getClass() != user.getClass()){
             return false;
         }
         User convertedUser = (User) user;
