@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @Transactional
 @SpringBootTest
 @AutoConfigureMockMvc
-public class UserControllerIntegrationTests {
+class UserControllerIntegrationTests {
     @Autowired
     private MockMvc mockMvc;
     @Autowired
