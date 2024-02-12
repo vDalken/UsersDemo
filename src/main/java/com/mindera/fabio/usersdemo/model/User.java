@@ -35,4 +35,9 @@ public class User {
                 Objects.equals(address, convertedUser.address) &&
                 Objects.equals(password, convertedUser.password);
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, email, address, password);
+    }
 }
