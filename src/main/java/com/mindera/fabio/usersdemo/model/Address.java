@@ -21,7 +21,7 @@ public class Address {
 
     @Override
     public boolean equals(Object address) {
-        if(getClass() != address.getClass()){
+        if(address == null || getClass() != address.getClass()){
             return false;
         }
         Address convertedAddress = (Address) address;
