@@ -1,6 +1,5 @@
 package com.mindera.fabio.usersdemo.exception_handler;
 
-import com.mindera.fabio.usersdemo.exceptions.UserCannotBeNullException;
 import com.mindera.fabio.usersdemo.exceptions.UserDoesNotMatchException;
 import com.mindera.fabio.usersdemo.exceptions.UserFieldsCannotBeNullOrEmptyException;
 import com.mindera.fabio.usersdemo.exceptions.UserNotFoundException;
@@ -14,11 +13,6 @@ public class ControllerExceptionHandler {
 
     @ExceptionHandler(UserDoesNotMatchException.class)
     public ResponseEntity<String> handleUserDoesNotMatchException(UserDoesNotMatchException e){
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-    }
-
-    @ExceptionHandler(UserCannotBeNullException.class)
-    public ResponseEntity<String> handleUserCannotBeNullException(UserCannotBeNullException e){
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
 
