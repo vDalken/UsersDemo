@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @Transactional
 @SpringBootTest
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters=false) //filters like security won't be applied to the tests
 class UserControllerIntegrationTests {
     @Autowired
     private MockMvc mockMvc;
