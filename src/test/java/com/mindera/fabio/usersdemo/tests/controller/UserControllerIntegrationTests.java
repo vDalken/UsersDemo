@@ -241,6 +241,14 @@ class UserControllerIntegrationTests {
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("User fields cannot be null or empty"));
     }
+    @Test
+    void updateUser_ThrowsUserDoesNotMatchException() throws Exception{
+        mockMvc.perform(put("/user/{userId}",2L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(sampleUser1)))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("UserId and request body id do not match"));
+    }
 
     @Test
     void deleteUser_ReturnDeletedUser() throws Exception{
