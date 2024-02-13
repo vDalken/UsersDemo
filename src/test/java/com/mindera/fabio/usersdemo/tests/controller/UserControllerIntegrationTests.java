@@ -180,6 +180,32 @@ class UserControllerIntegrationTests {
         Assertions.assertTrue(usersRepository.existsById(maxUserId));
         assertEquals(newUser, result);
     }
+
+
+    @Test
+    void updateUser_Success() throws Exception {
+        userService.createUser(sampleUser1);
+        sampleUser1.setPassword("129112");
+        sampleUser1.setName("john");
+
+        String sampleJson = objectMapper.writeValueAsString(sampleUser1);
+
+        ResultActions resultActions = mockMvc.perform(put("/user/{userId}", sampleUser1.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(sampleJson));
+
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", Matchers.is(sampleUser1.getId().intValue())))
+                .andExpect(jsonPath("$.name", Matchers.is(sampleUser1.getName())))
+                .andExpect(jsonPath("$.email", Matchers.is(sampleUser1.getEmail())))
+                .andExpect(jsonPath("$.address.id", Matchers.is(sampleUser1.getAddress().getId().intValue())))
+                .andExpect(jsonPath("$.address.country", Matchers.is(sampleUser1.getAddress().getCountry())))
+                .andExpect(jsonPath("$.address.city", Matchers.is(sampleUser1.getAddress().getCity())))
+                .andExpect(jsonPath("$.address.street", Matchers.is(sampleUser1.getAddress().getStreet())))
+                .andExpect(jsonPath("$.address.number", Matchers.is(sampleUser1.getAddress().getNumber())))
+                .andExpect(jsonPath("$.password", Matchers.is(sampleUser1.getPassword())));
+    }
+
     @Test
     void updateUser_ThrowsUserFieldsCannotBeNullOrEmptyException() throws Exception {
         // Test multiple null fields
