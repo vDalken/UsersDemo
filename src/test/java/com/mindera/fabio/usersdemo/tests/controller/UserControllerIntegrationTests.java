@@ -23,6 +23,8 @@ import java.util.List;
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Transactional
 @SpringBootTest
@@ -74,7 +76,7 @@ class UserControllerIntegrationTests {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(sampleUser1))); //user sample
 
-        response.andExpect(MockMvcResultMatchers.status().isOk())
+        response.andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id", CoreMatchers.is(sampleUser1.getId().intValue())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name", CoreMatchers.is(sampleUser1.getName())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.password", CoreMatchers.is(sampleUser1.getPassword())));
@@ -98,7 +100,7 @@ class UserControllerIntegrationTests {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(sampleUsers)));
 
-        response.andExpect(MockMvcResultMatchers.status().isOk());
+        response.andExpect(status().isOk());
     }
 
     @Test
@@ -119,7 +121,7 @@ class UserControllerIntegrationTests {
         ResultActions response = mockMvc.perform(get("/user/{userID}", returnedUserId)
                 .contentType(MediaType.APPLICATION_JSON));
 
-        response.andExpect(MockMvcResultMatchers.status().isOk())
+        response.andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id",CoreMatchers.is(returnedUser.getId().intValue())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name",CoreMatchers.is(returnedUser.getName())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.password",CoreMatchers.is(returnedUser.getPassword())));
@@ -144,7 +146,7 @@ class UserControllerIntegrationTests {
     @Test
     void updateUser_ReturnUpdatedUser() throws Exception{
 
-        User newUser = userService.createUser(sampleUser2);
+        User newUser = userService.createUser(sampleUser1);
 
         newUser.setName("bixoooo");
         newUser.setPassword("credoooo");
@@ -155,7 +157,7 @@ class UserControllerIntegrationTests {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(newUser)));
 
-        response.andExpect(MockMvcResultMatchers.status().isOk())
+        response.andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id",CoreMatchers.is(updatedUser.getId().intValue())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name", CoreMatchers.is(updatedUser.getName())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.password",CoreMatchers.is(updatedUser.getPassword())));
@@ -190,7 +192,7 @@ class UserControllerIntegrationTests {
         ResultActions response = mockMvc.perform(delete("/user/{id}",sampleUser1Id)
                 .contentType(MediaType.APPLICATION_JSON));
 
-        response.andExpect(MockMvcResultMatchers.status().isOk());
+        response.andExpect(status().isOk());
     }
 
     @Test
