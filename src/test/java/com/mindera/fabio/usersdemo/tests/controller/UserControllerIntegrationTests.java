@@ -18,15 +18,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.List;
 
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @Transactional
 @SpringBootTest
@@ -48,15 +46,12 @@ class UserControllerIntegrationTests {
     List<User> sampleUsers;
     private User userToCreate;
     private User existingUser;
-    private User nonExistingUser;
     private Long nonExistingUserId;
-    private User userWithNullField;
-    private Long nonExistingAddressId;
-    private User sampleUser4;
+    private User userWithNullFields;
 
     @BeforeEach
     public void init() {
-        nonExistingAddressId = addressesRepository.findMaxAddressId()+1;
+        Long nonExistingAddressId = addressesRepository.findMaxAddressId() + 1;
         Address sampleAddress = Address.builder().id(nonExistingAddressId).country("portugal").city("porto").street("rua das flores").number(123).build();
         sampleUser1 = User.builder().id(1L).name("marlao").email("mixooo@gmail.com").address(sampleAddress).password("1pow").build();
         sampleUser2 = User.builder().id(9L).name("mima").password("youwww").build();
@@ -71,11 +66,9 @@ class UserControllerIntegrationTests {
         );
 
         existingUser = User.builder().id(1L).name("oldName").password("oldPass").build();
-        nonExistingUser = User.builder().id(910L).name("naoexiste").password("piwu").build();
 
         nonExistingUserId = usersRepository.findMaxUserId()+1;
-        sampleUser4 = User.builder().id(nonExistingUserId).name("marlao").email("mixooo@gmail.com").address(sampleAddress).password("1pow").build();
-        userWithNullField = User.builder().id(98L).name("ricas").email("ohsoxa@gmail.com").address(null).password("123").build();
+        userWithNullFields = User.builder().id(98L).name("ricas").email("ohsoxa@gmail.com").address(null).password("123").build();
     }
 
     @Test
@@ -87,9 +80,9 @@ class UserControllerIntegrationTests {
                 .content(objectMapper.writeValueAsString(sampleUser1))); //user sample
 
         response.andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id", CoreMatchers.is(sampleUser1.getId().intValue())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name", CoreMatchers.is(sampleUser1.getName())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.password", CoreMatchers.is(sampleUser1.getPassword())));
+                .andExpect(jsonPath("$.id", CoreMatchers.is(sampleUser1.getId().intValue())))
+                .andExpect(jsonPath("$.name", CoreMatchers.is(sampleUser1.getName())))
+                .andExpect(jsonPath("$.password", CoreMatchers.is(sampleUser1.getPassword())));
     }
 
     @Test
@@ -132,9 +125,9 @@ class UserControllerIntegrationTests {
                 .contentType(MediaType.APPLICATION_JSON));
 
         response.andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id",CoreMatchers.is(returnedUser.getId().intValue())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name",CoreMatchers.is(returnedUser.getName())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.password",CoreMatchers.is(returnedUser.getPassword())));
+                .andExpect(jsonPath("$.id",CoreMatchers.is(returnedUser.getId().intValue())))
+                .andExpect(jsonPath("$.name",CoreMatchers.is(returnedUser.getName())))
+                .andExpect(jsonPath("$.password",CoreMatchers.is(returnedUser.getPassword())));
     }
 
     @Test
@@ -168,9 +161,9 @@ class UserControllerIntegrationTests {
                 .content(objectMapper.writeValueAsString(newUser)));
 
         response.andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id",CoreMatchers.is(updatedUser.getId().intValue())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name", CoreMatchers.is(updatedUser.getName())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.password",CoreMatchers.is(updatedUser.getPassword())));
+                .andExpect(jsonPath("$.id",CoreMatchers.is(updatedUser.getId().intValue())))
+                .andExpect(jsonPath("$.name", CoreMatchers.is(updatedUser.getName())))
+                .andExpect(jsonPath("$.password",CoreMatchers.is(updatedUser.getPassword())));
     }
 
     @Test
