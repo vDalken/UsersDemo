@@ -1,6 +1,5 @@
 package com.mindera.fabio.usersdemo.restcontrollers;
 
-import com.mindera.fabio.usersdemo.exceptions.UserCannotBeNullException;
 import com.mindera.fabio.usersdemo.exceptions.UserDoesNotMatchException;
 import com.mindera.fabio.usersdemo.exceptions.UserFieldsCannotBeNullOrEmptyException;
 import com.mindera.fabio.usersdemo.model.User;
@@ -38,10 +37,7 @@ public class UserController {
         if(!Objects.equals(userId, user.getId())){
             throw new UserDoesNotMatchException();
         }
-        if(user == null){
-            throw new UserCannotBeNullException();
-        }
-        if (user.getId() == null || user.getName() == null || user.getName().isEmpty() || user.getPassword() == null || user.getPassword().isEmpty()) {
+        if (user.getId() == null || user.getName() == null || user.getName().isEmpty() || user.getPassword() == null || user.getPassword().isEmpty() || user.getAddress() == null) {
             throw new UserFieldsCannotBeNullOrEmptyException();
         }
         return service.updateUser(user);
