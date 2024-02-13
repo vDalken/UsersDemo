@@ -2,7 +2,9 @@ package com.mindera.fabio.usersdemo.tests.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mindera.fabio.usersdemo.exceptions.UserNotFoundException;
+import com.mindera.fabio.usersdemo.interfaces.AddressesRepository;
 import com.mindera.fabio.usersdemo.interfaces.UsersRepository;
+import com.mindera.fabio.usersdemo.model.Address;
 import com.mindera.fabio.usersdemo.model.User;
 import com.mindera.fabio.usersdemo.services.UserService;
 import jakarta.transaction.Transactional;
@@ -37,6 +39,8 @@ class UserControllerIntegrationTests {
     @Autowired
     private UsersRepository usersRepository;
     @Autowired
+    private AddressesRepository addressesRepository;
+    @Autowired
     private ObjectMapper objectMapper;
     private User sampleUser1;
     private User sampleUser2;
@@ -46,14 +50,17 @@ class UserControllerIntegrationTests {
     private User existingUser;
     private User nonExistingUser;
     private Long nonExistingUserId;
+    private User userWithNullField;
+    private Long nonExistingAddressId;
 
     @BeforeEach
     public void init() {
-        sampleUser1 = User.builder().id(1L).name("marlao").password("1pow").build();
+        nonExistingAddressId = addressesRepository.findMaxAddressId()+1;
+        Address sampleAddress = Address.builder().id(nonExistingAddressId).country("portugal").city("porto").street("rua das flores").number(123).build();
+        sampleUser1 = User.builder().id(1L).name("marlao").email("mixooo@gmail.com").address(sampleAddress).password("1pow").build();
         sampleUser2 = User.builder().id(9L).name("mima").password("youwww").build();
         sampleUser3 = User.builder().id(3L).name("weiza").password("UAUUU").build();
         sampleUsers = List.of(sampleUser1,sampleUser2,sampleUser3);
-
         userToCreate = User.builder().name("fabio").password("123").build();
 
         sampleUsers = List.of(
