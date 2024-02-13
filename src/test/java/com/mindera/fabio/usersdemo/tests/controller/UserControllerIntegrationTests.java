@@ -201,6 +201,16 @@ class UserControllerIntegrationTests {
     }
 
     @Test
+    void updateUser_ThrowsUserDoesNotMatchException() throws Exception{
+            mockMvc.perform(put("/user/{userId}",2L)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(sampleUser1)))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(content().string("UserId and request body id do not match"));
+    }
+
+
+    @Test
     void deleteUser_ReturnDeletedUser() throws Exception{
         userService.createUser(sampleUser1);
         Long sampleUser1Id = sampleUser1.getId();
@@ -226,7 +236,6 @@ class UserControllerIntegrationTests {
     @Test
     void deleteUser_NonExistingUserId_ThrowUserNotFoundException() {
         usersRepository.findById(nonExistingUserId);
-
         assertThrows(UserNotFoundException.class, () -> userService.deleteUser(nonExistingUserId));
     }
 }
