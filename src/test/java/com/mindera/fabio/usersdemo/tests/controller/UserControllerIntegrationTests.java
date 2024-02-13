@@ -9,6 +9,7 @@ import com.mindera.fabio.usersdemo.model.User;
 import com.mindera.fabio.usersdemo.services.UserService;
 import jakarta.transaction.Transactional;
 import org.hamcrest.CoreMatchers;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
@@ -178,6 +179,41 @@ class UserControllerIntegrationTests {
 
         Assertions.assertTrue(usersRepository.existsById(maxUserId));
         assertEquals(newUser, result);
+    }
+    @Test
+    void updateUser_ThrowsUserFieldsCannotBeNullOrEmptyException() throws Exception {
+        // Test multiple null fields
+        performUpdateUserAndExpectBadRequest(userWithNullFields);
+
+        // Test null name
+        sampleUser1.setName(null);
+        performUpdateUserAndExpectBadRequest(sampleUser1);
+
+        // Test empty name
+        sampleUser1.setName("");
+        performUpdateUserAndExpectBadRequest(sampleUser1);
+
+        // Test null password
+        sampleUser1.setName("marlao");
+        sampleUser1.setPassword(null);
+        performUpdateUserAndExpectBadRequest(sampleUser1);
+
+        // Test empty password
+        sampleUser1.setPassword("");
+        performUpdateUserAndExpectBadRequest(sampleUser1);
+
+        // Test null address
+        sampleUser1.setPassword("1pow");
+        sampleUser1.setAddress(null);
+        performUpdateUserAndExpectBadRequest(sampleUser1);
+    }
+
+    private void performUpdateUserAndExpectBadRequest(User user) throws Exception {
+        mockMvc.perform(put("/user/{userId}", user.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(user)))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("User fields cannot be null or empty"));
     }
 
     @Test
