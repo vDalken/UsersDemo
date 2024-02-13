@@ -73,6 +73,7 @@ class UserControllerIntegrationTests {
         nonExistingUser = User.builder().id(910L).name("naoexiste").password("piwu").build();
 
         nonExistingUserId = usersRepository.findMaxUserId()+1;
+        userWithNullField = User.builder().id(98L).name("ricas").email("ohsoxa@gmail.com").address(null).password("123").build();
     }
 
     @Test
@@ -188,6 +189,15 @@ class UserControllerIntegrationTests {
     void updateUser_NonExistingUserId_ThrowUserNotFoundException() {
         Assertions.assertFalse(usersRepository.existsById(usersRepository.findMaxUserId()+1));
         assertThrows(UserNotFoundException.class, () -> userService.updateUser(nonExistingUser));
+    }
+
+    @Test
+    void updateUser_ThrowsUserFieldsCannotBeNullOrEmptyException() throws Exception{
+            mockMvc.perform(put("/user/{userId}",userWithNullField.getId())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(userWithNullField)))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(content().string("User fields cannot be null or empty"));
     }
 
     @Test
