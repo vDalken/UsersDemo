@@ -42,8 +42,6 @@ class UserControllerIntegrationTests {
     @Autowired
     private ObjectMapper objectMapper;
     private User sampleUser1;
-    private User sampleUser2;
-    private User sampleUser3;
     List<User> sampleUsers;
     private User userToCreate;
     private User existingUser;
@@ -55,9 +53,9 @@ class UserControllerIntegrationTests {
         Long nonExistingAddressId = addressesRepository.findMaxAddressId() + 1;
         Address sampleAddress = Address.builder().id(nonExistingAddressId).country("portugal").city("porto").street("rua das flores").number(123).build();
         sampleUser1 = User.builder().id(1L).name("marlao").email("mixooo@gmail.com").address(sampleAddress).password("1pow").build();
-        sampleUser2 = User.builder().id(9L).name("mima").password("youwww").build();
-        sampleUser3 = User.builder().id(3L).name("weiza").password("UAUUU").build();
-        sampleUsers = List.of(sampleUser1,sampleUser2,sampleUser3);
+        User sampleUser2 = User.builder().id(9L).name("mima").password("youwww").build();
+        User sampleUser3 = User.builder().id(3L).name("weiza").password("UAUUU").build();
+        sampleUsers = List.of(sampleUser1, sampleUser2, sampleUser3);
         userToCreate = User.builder().name("fabio").password("123").build();
 
         sampleUsers = List.of(
