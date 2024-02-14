@@ -6,7 +6,6 @@ import com.mindera.fabio.usersdemo.interfaces.UsersRepository;
 import com.mindera.fabio.usersdemo.model.Address;
 import com.mindera.fabio.usersdemo.model.User;
 import com.mindera.fabio.usersdemo.services.UserService;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,21 +13,14 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceUnitTests {
@@ -38,8 +30,6 @@ class UserServiceUnitTests {
     private AddressesRepository addressesRepository;
     @InjectMocks //injecting the mock repository in the UserService
     private UserService userService; //the same as: UserService userService = new UserService(usersRepository);
-    private User createdUser;
-    private User userToCreate;
     private User sampleUser;
     private List<User> sampleUsers;
     private User existingUser;
@@ -52,8 +42,6 @@ class UserServiceUnitTests {
         Long nonExistingAddressId = addressesRepository.findMaxAddressId() + 1;
         Address sampleAddress = Address.builder().id(nonExistingAddressId).country("portugal").city("porto").street("rua das flores").number(123).build();
         sampleUser1 = User.builder().id(1L).name("marlao").email("mixooo@gmail.com").address(sampleAddress).password("1pow").build();
-        userToCreate = User.builder().name("fabio").password("123").build();
-        createdUser = User.builder().id(1L).name("fabio").password("123").build();
         sampleUser = User.builder().id(2L).name("rui").password("231").build();
 
         sampleUsers = List.of(
@@ -69,11 +57,13 @@ class UserServiceUnitTests {
 
     @Test
     void createUser_ReturnsCreatedUser() {
-        given(userService.createUser(userToCreate)).willReturn(createdUser);
+        sampleUser1.setId(null);
+        User expectedUser = sampleUser1;
+        given(userService.createUser(sampleUser1)).willReturn(expectedUser);
 
-        userService.createUser(userToCreate);
+        userService.createUser(sampleUser1);
 
-        verify(usersRepository).save(userToCreate);
+        verify(usersRepository).save(expectedUser);
     }
 
     @Test
