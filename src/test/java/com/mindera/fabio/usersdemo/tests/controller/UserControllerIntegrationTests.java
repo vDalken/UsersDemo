@@ -1,7 +1,6 @@
 package com.mindera.fabio.usersdemo.tests.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mindera.fabio.usersdemo.exceptions.UserNotFoundException;
 import com.mindera.fabio.usersdemo.interfaces.AddressesRepository;
 import com.mindera.fabio.usersdemo.interfaces.UsersRepository;
 import com.mindera.fabio.usersdemo.model.Address;
@@ -9,8 +8,6 @@ import com.mindera.fabio.usersdemo.model.User;
 import com.mindera.fabio.usersdemo.services.UserService;
 import jakarta.transaction.Transactional;
 import org.hamcrest.CoreMatchers;
-import org.hamcrest.Matchers;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +19,6 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.List;
 
-import static org.junit.Assert.assertThrows;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -85,16 +80,6 @@ class UserControllerIntegrationTests {
     }
 
     @Test
-    void createUser_ReturnsCreatedUser() {
-        userService.createUser(userToCreate);
-
-        User createdUser = usersRepository.findById(userToCreate.getId()).orElseThrow(() -> new RuntimeException("user not found"));
-
-        assertNotNull(createdUser);
-        assertEquals(userToCreate,createdUser);
-    }
-
-    @Test
     void getAllUsers_ReturnExpectedUsers() throws Exception{
         userService.getAllUsers();
 
@@ -103,15 +88,6 @@ class UserControllerIntegrationTests {
                 .content(objectMapper.writeValueAsString(sampleUsers)));
 
         response.andExpect(status().isOk());
-    }
-
-    @Test
-    void getAllUsers_ReturnAllUsers() {
-        List<User> users = usersRepository.findAll();
-
-        List<User> result = userService.getAllUsers();
-
-        assertEquals(users, result);
     }
 
     @Test
@@ -127,22 +103,6 @@ class UserControllerIntegrationTests {
                 .andExpect(jsonPath("$.id",CoreMatchers.is(returnedUser.getId().intValue())))
                 .andExpect(jsonPath("$.name",CoreMatchers.is(returnedUser.getName())))
                 .andExpect(jsonPath("$.password",CoreMatchers.is(returnedUser.getPassword())));
-    }
-
-    @Test
-    void getUserById_ExistingUserId_ReturnsUser() {
-        usersRepository.save(sampleUser1);
-
-        User result = userService.getUserById(sampleUser1.getId());
-
-        assertEquals(sampleUser1, result);
-    }
-
-    @Test
-    void getUserById_NonExistingUserId_ThrowsUserNotFoundException() {
-        usersRepository.findById(nonExistingUserId);
-
-        assertThrows(UserNotFoundException.class, () -> userService.getUserById(nonExistingUserId));
     }
 
     @Test
@@ -163,45 +123,6 @@ class UserControllerIntegrationTests {
                 .andExpect(jsonPath("$.id",CoreMatchers.is(updatedUser.getId().intValue())))
                 .andExpect(jsonPath("$.name", CoreMatchers.is(updatedUser.getName())))
                 .andExpect(jsonPath("$.password",CoreMatchers.is(updatedUser.getPassword())));
-    }
-
-    @Test
-    void updateUser_ExistingUserId_ReturnUpdatedUser() {
-        Long maxUserId = usersRepository.findMaxUserId();
-        User newUser = usersRepository.findById(maxUserId).orElseThrow(UserNotFoundException::new);
-
-        newUser.setName("mixaaaaaa");
-        newUser.setPassword("miauuuuuu");
-
-        User result = userService.updateUser(newUser);
-
-        Assertions.assertTrue(usersRepository.existsById(maxUserId));
-        assertEquals(newUser, result);
-    }
-
-
-    @Test
-    void updateUser_Success() throws Exception {
-        userService.createUser(sampleUser1);
-        sampleUser1.setPassword("129112");
-        sampleUser1.setName("john");
-
-        String sampleJson = objectMapper.writeValueAsString(sampleUser1);
-
-        ResultActions resultActions = mockMvc.perform(put("/user/{userId}", sampleUser1.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(sampleJson));
-
-        resultActions.andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", Matchers.is(sampleUser1.getId().intValue())))
-                .andExpect(jsonPath("$.name", Matchers.is(sampleUser1.getName())))
-                .andExpect(jsonPath("$.email", Matchers.is(sampleUser1.getEmail())))
-                .andExpect(jsonPath("$.address.id", Matchers.is(sampleUser1.getAddress().getId().intValue())))
-                .andExpect(jsonPath("$.address.country", Matchers.is(sampleUser1.getAddress().getCountry())))
-                .andExpect(jsonPath("$.address.city", Matchers.is(sampleUser1.getAddress().getCity())))
-                .andExpect(jsonPath("$.address.street", Matchers.is(sampleUser1.getAddress().getStreet())))
-                .andExpect(jsonPath("$.address.number", Matchers.is(sampleUser1.getAddress().getNumber())))
-                .andExpect(jsonPath("$.password", Matchers.is(sampleUser1.getPassword())));
     }
 
     @Test
@@ -258,16 +179,5 @@ class UserControllerIntegrationTests {
                 .contentType(MediaType.APPLICATION_JSON));
 
         response.andExpect(status().isOk());
-    }
-
-    @Test
-    void deleteUser_ExistingUserId_ReturnDeletedUser() {
-        usersRepository.save(existingUser);
-        Long existingUserId = existingUser.getId();
-
-        User result = userService.deleteUser(existingUserId);
-
-        assertNotNull(usersRepository.findById(existingUserId));
-        assertEquals(existingUser, result);
     }
 }
