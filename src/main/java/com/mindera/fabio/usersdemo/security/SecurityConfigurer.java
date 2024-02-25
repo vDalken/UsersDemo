@@ -5,19 +5,17 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfigurer {
 
-    @Autowired
-    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        auth
-                .inMemoryAuthentication() //authentication is configured directly within the application's code
-                .withUser("username") //username of the user should be username
-                .password("{noop}password") //password of the user should be a plain string saying password
-                .roles("user"); //categorizing the user based on their permission
     @Bean
     public SecurityFilterChain authenticationFilterChain(HttpSecurity http) throws Exception{
         return http
@@ -31,4 +29,17 @@ public class SecurityConfigurer {
     }
     }
 
+    @Bean
+    public UserDetailsService userDetailsService(PasswordEncoder passwordEncoder){
+
+        String password = passwordEncoder.encode("password");
+
+        UserDetails userDetails = User
+                .builder()
+                .username("user")
+                .password(password)
+                .build();
+
+        return new InMemoryUserDetailsManager(userDetails);
+    }
 }
