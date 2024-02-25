@@ -7,7 +7,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 
 @Configuration
 @EnableWebSecurity
-public class CustomWebSecurityConfigurerAdapter{
+public class SecurityConfigurer {
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
